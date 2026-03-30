@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - RecipeHub{% endblock %}
+
+{% block content %}
+    <section class="hero">
+        <h2>Benvenuto in RecipeHub</h2>
+        <p>Il tuo spazio locale per gestire, consultare e organizzare ricette culinarie.</p>
+        <a href="{% url 'recipe_list' %}" class="btn-link">Vai alle ricette</a>
+    </section>
+
+    <section class="featured-section">
+        <h3>Ricette in evidenza</h3>
+
+        {% if featured_recipes %}
+            <div class="recipe-grid">
+                {% for recipe in featured_recipes %}
+                    <article class="recipe-card">
+                        {% if recipe.image %}
+                            <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}" class="recipe-card-image">
+                        {% endif %}
+
+                        <div class="recipe-card-content">
+                            <h4>
+                                <a href="{% url 'recipe_detail' recipe.slug %}">
+                                    {{ recipe.title }}
+                                </a>
+                            </h4>
+
+                            {% if recipe.short_description %}
+                                <p>{{ recipe.short_description|truncatechars:100 }}</p>
+                            {% endif %}
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>Nessuna ricetta in evidenza disponibile.</p>
+        {% endif %}
+    </section>
+{% endblock %}

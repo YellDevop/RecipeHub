@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+
+{% block title %}Dettaglio gestionale - {{ recipe.title }}{% endblock %}
+
+{% block content %}
+    <section class="dashboard-header">
+        <h2>Dettaglio ricetta</h2>
+        <p>Vista gestionale completa della ricetta selezionata.</p>
+    </section>
+
+    <section class="dashboard-toolbar">
+        <a href="{% url 'dashboard_recipe_list' %}" class="btn-secondary">Torna alla gestione</a>
+        <a href="{% url 'recipe_update' recipe.pk %}" class="btn-primary">Modifica</a>
+        <a href="{% url 'recipe_delete' recipe.pk %}" class="btn-danger">Elimina</a>
+
+        {% if recipe.is_published %}
+            <a href="{% url 'recipe_detail' recipe.slug %}" class="btn-secondary">Apri vista pubblica</a>
+        {% endif %}
+    </section>
+
+    <article class="recipe-detail">
+        <header class="recipe-detail-header">
+            <h2>{{ recipe.title }}</h2>
+
+            {% if recipe.short_description %}
+                <p class="recipe-detail-description">{{ recipe.short_description }}</p>
+            {% endif %}
+        </header>
+
+        {% if recipe.image %}
+            <div class="recipe-detail-image-wrapper">
+                <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}" class="recipe-detail-image">
+            </div>
+        {% endif %}
+
+        <section class="recipe-detail-meta">
+            <div class="meta-box">
+                <strong>Stato pubblicazione</strong>
+                <span>
+                    {% if recipe.is_published %}
+                        Pubblicata
+                    {% else %}
+                        Bozza
+                    {% endif %}
+                </span>
+            </div>
+
+            <div class="meta-box">
+                <strong>In evidenza</strong>
+                <span>
+                    {% if recipe.is_featured %}
+                        Sì
+                    {% else %}
+                        No
+                    {% endif %}
+                </span>
+            </div>
+
+            <div class="meta-box">
+                <strong>Categoria</strong>
+                <span>{{ recipe.get_category_display }}</span>
+            </div>
+
+            <div class="meta-box">
+                <strong>Difficoltà</strong>
+                <span>{{ recipe.get_difficulty_display }}</span>
+            </div>
+
+            <div class="meta-box">
+                <strong>Preparazione</strong>
+                <span>{{ recipe.prep_time }} min</span>
+            </div>
+
+            <div class="meta-box">
+                <strong>Cottura</strong>
+                <span>
+                    {% if recipe.cook_time %}
+                        {{ recipe.cook_time }} min
+                    {% else %}
+                        -
+                    {% endif %}
+                </span>
+            </div>
+
+            <div class="meta-box">
+                <strong>Tempo totale</strong>
+                <span>{{ recipe.total_time }} min</span>
+            </div>
+
+            <div class="meta-box">
+                <strong>Porzioni</strong>
+                <span>
+                    {% if recipe.servings %}
+                        {{ recipe.servings }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </span>
+            </div>
+
+            <div class="meta-box">
+                <strong>Tipo cucina</strong>
+                <span>
+                    {% if recipe.cuisine_type %}
+                        {{ recipe.cuisine_type }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </span>
+            </div>
+
+            <div class="meta-box">
+                <strong>Slug</strong>
+                <span>{{ recipe.slug }}</span>
+            </div>
+
+            <div class="meta-box">
+                <strong>Creata il</strong>
+                <span>{{ recipe.created_at|date:"d/m/Y H:i" }}</span>
+            </div>
+
+            <div class="meta-box">
+                <strong>Aggiornata il</strong>
+                <span>{{ recipe.updated_at|date:"d/m/Y H:i" }}</span>
+            </div>
+        </section>
+
+        <section class="recipe-detail-section">
+            <h3>Ingredienti</h3>
+            <div class="recipe-text-block">
+                {{ recipe.ingredients|linebreaks }}
+            </div>
+        </section>
+
+        <section class="recipe-detail-section">
+            <h3>Procedimento</h3>
+            <div class="recipe-text-block">
+                {{ recipe.instructions|linebreaks }}
+            </div>
+        </section>
+    </article>
+{% endblock %}

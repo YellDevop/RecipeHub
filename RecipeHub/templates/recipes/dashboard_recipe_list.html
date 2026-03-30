@@ -1,0 +1,262 @@
+{% extends 'base.html' %} {% block title %}Gestione ricette - RecipeHub {% endblock %} {% block content %}
+<section class="dashboard-header">
+  <h2>Gestione ricette</h2>
+  <p>Elenco completo delle ricette presenti nel sistema.</p>
+</section>
+
+<section class="dashboard-toolbar">
+  <a href="{% url 'recipe_create' %}" class="btn-primary">Nuova ricetta</a>
+</section>
+
+<section class="filter-card">
+  <form method="get" class="filter-form">
+    <div class="filter-grid">
+      <div class="form-group">
+        <label for="search">Cerca</label>
+        <input
+          type="text"
+          name="search"
+          id="search"
+          value="{{ search }}"
+          class="form-control"
+          placeholder="Titolo o descrizione"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="category">Categoria</label>
+        <select name="category" id="category" class="form-control">
+          <option value="">Tutte</option>
+          {% for value, label in category_choices %}
+          <option
+            value="{{ value }}"
+            {%
+            if
+            selected_category=""
+            ="value"
+            %}selected{%
+            endif
+            %}
+          >
+            {{ label }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="difficulty">Difficoltà</label>
+        <select name="difficulty" id="difficulty" class="form-control">
+          <option value="">Tutte</option>
+          {% for value, label in difficulty_choices %}
+          <option
+            value="{{ value }}"
+            {%
+            if
+            selected_difficulty=""
+            ="value"
+            %}selected{%
+            endif
+            %}
+          >
+            {{ label }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="publication_status">Stato pubblicazione</label>
+        <select
+          name="publication_status"
+          id="publication_status"
+          class="form-control"
+        >
+          <option value="">Tutti</option>
+          <option
+            value="published"
+            {%
+            if
+            selected_publication_status=""
+            ="published"
+            %}selected{%
+            endif
+            %}
+          >
+            Pubblicate
+          </option>
+          <option
+            value="draft"
+            {%
+            if
+            selected_publication_status=""
+            ="draft"
+            %}selected{%
+            endif
+            %}
+          >
+            Bozze
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="ordering">Ordina per</label>
+        <select name="ordering" id="ordering" class="form-control">
+          <option value="">Più recenti</option>
+          <option
+            value="title_asc"
+            {%
+            if
+            selected_ordering=""
+            ="title_asc"
+            %}selected{%
+            endif
+            %}
+          >
+            Titolo A-Z
+          </option>
+          <option
+            value="title_desc"
+            {%
+            if
+            selected_ordering=""
+            ="title_desc"
+            %}selected{%
+            endif
+            %}
+          >
+            Titolo Z-A
+          </option>
+          <option
+            value="created_asc"
+            {%
+            if
+            selected_ordering=""
+            ="created_asc"
+            %}selected{%
+            endif
+            %}
+          >
+            Meno recenti
+          </option>
+          <option
+            value="prep_time_asc"
+            {%
+            if
+            selected_ordering=""
+            ="prep_time_asc"
+            %}selected{%
+            endif
+            %}
+          >
+            Preparazione più veloce
+          </option>
+          <option
+            value="prep_time_desc"
+            {%
+            if
+            selected_ordering=""
+            ="prep_time_desc"
+            %}selected{%
+            endif
+            %}
+          >
+            Preparazione più lunga
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn-primary">Applica filtri</button>
+      <a href="{% url 'dashboard_recipe_list' %}" class="btn-secondary"
+        >Reset</a
+      >
+    </div>
+  </form>
+</section>
+
+<section class="table-card">
+  {% if recipes %}
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Titolo</th>
+          <th>Categoria</th>
+          <th>Difficoltà</th>
+          <th>Pubblicata</th>
+          <th>In evidenza</th>
+          <th>Creata il</th>
+          <th>Azioni</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for recipe in recipes %}
+        <tr>
+          <td>{{ recipe.title }}</td>
+          <td>{{ recipe.get_category_display }}</td>
+          <td>{{ recipe.get_difficulty_display }}</td>
+          <td>{% if recipe.is_published %} Sì {% else %} No {% endif %}</td>
+          <td>{% if recipe.is_featured %} Sì {% else %} No {% endif %}</td>
+          <td>{{ recipe.created_at|date:"d/m/Y H:i" }}</td>
+          <td class="table-actions">
+            <a href="{% url 'dashboard_recipe_detail' recipe.pk %}"
+              >Dettaglio</a
+            >
+
+            {% if recipe.is_published %}
+            <a href="{% url 'recipe_detail' recipe.slug %}">Vista pubblica</a>
+            {% endif %}
+
+            <a href="{% url 'recipe_update' recipe.pk %}">Modifica</a>
+            <a href="{% url 'recipe_delete' recipe.pk %}">Elimina</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if page_obj.paginator.num_pages > 1 %}
+  <nav class="pagination">
+    {% if page_obj.has_previous %}
+    <a
+      href="?page=1&search={{ search }}&category={{ selected_category }}&difficulty={{ selected_difficulty }}&publication_status={{ selected_publication_status }}&ordering={{ selected_ordering }}"
+      class="pagination-link"
+    >
+      Prima
+    </a>
+    <a
+      href="?page={{ page_obj.previous_page_number }}&search={{ search }}&category={{ selected_category }}&difficulty={{ selected_difficulty }}&publication_status={{ selected_publication_status }}&ordering={{ selected_ordering }}"
+      class="pagination-link"
+    >
+      Precedente
+    </a>
+    {% endif %}
+
+    <span class="pagination-current">
+      Pagina {{ page_obj.number }} di {{ page_obj.paginator.num_pages }}
+    </span>
+
+    {% if page_obj.has_next %}
+    <a
+      href="?page={{ page_obj.next_page_number }}&search={{ search }}&category={{ selected_category }}&difficulty={{ selected_difficulty }}&publication_status={{ selected_publication_status }}&ordering={{ selected_ordering }}"
+      class="pagination-link"
+    >
+      Successiva
+    </a>
+    <a
+      href="?page={{ page_obj.paginator.num_pages }}&search={{ search }}&category={{ selected_category }}&difficulty={{ selected_difficulty }}&publication_status={{ selected_publication_status }}&ordering={{ selected_ordering }}"
+      class="pagination-link"
+    >
+      Ultima
+    </a>
+    {% endif %}
+  </nav>
+  {% endif %} {% else %}
+  <p>Nessuna ricetta trovata con i filtri selezionati.</p>
+  {% endif %}
+</section>
+{% endblock %}

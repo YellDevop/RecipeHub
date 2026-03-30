@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% block title %}Ricette - RecipeHub{% endblock %}
+
+{% block content %}
+    <section class="page-header">
+        <h2>Tutte le ricette</h2>
+        <p>Esplora le ricette pubblicate e filtra il catalogo.</p>
+    </section>
+
+    <section class="filter-card">
+        <form method="get" class="filter-form">
+            <div class="filter-grid">
+                <div class="form-group">
+                    <label for="search">Cerca</label>
+                    <input
+                        type="text"
+                        name="search"
+                        id="search"
+                        value="{{ search }}"
+                        class="form-control"
+                        placeholder="Titolo o descrizione"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="category">Categoria</label>
+                    <select name="category" id="category" class="form-control">
+                        <option value="">Tutte</option>
+                        {% for value, label in category_choices %}
+                            <option value="{{ value }}" {% if selected_category == value %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="difficulty">Difficoltà</label>
+                    <select name="difficulty" id="difficulty" class="form-control">
+                        <option value="">Tutte</option>
+                        {% for value, label in difficulty_choices %}
+                            <option value="{{ value }}" {% if selected_difficulty == value %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="ordering">Ordina per</label>
+                    <select name="ordering" id="ordering" class="form-control">
+                        <option value="">Più recenti</option>
+                        <option value="title_asc" {% if selected_ordering == 'title_asc' %}selected{% endif %}>Titolo A-Z</option>
+                        <option value="title_desc" {% if selected_ordering == 'title_desc' %}selected{% endif %}>Titolo Z-A</option>
+                        <option value="created_asc" {% if selected_ordering == 'created_asc' %}selected{% endif %}>Meno recenti</option>
+                        <option value="prep_time_asc" {% if selected_ordering == 'prep_time_asc' %}selected{% endif %}>Preparazione più veloce</option>
+                        <option value="prep_time_desc" {% if selected_ordering == 'prep_time_desc' %}selected{% endif %}>Preparazione più lunga</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">Applica filtri</button>
+                <a href="{% url 'recipe_list' %}" class="btn-secondary">Reset</a>
+            </div>
+        </form>
+    </section>
+
+    <section>
+        {% if recipes %}
+            <div class="recipe-grid">
+                {% for recipe in recipes %}
+                    <article class="recipe-card">
+                        {% if recipe.image %}
+                            <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}" class="recipe-card-image">
+                        {% endif %}
+
+                        <div class="recipe-card-content">
+                            <h3>
+                                <a href="{% url 'recipe_detail' recipe.slug %}">
+                                    {{ recipe.title }}
+                                </a>
+                            </h3>
+
+                            {% if recipe.short_description %}
+                                <p>{{ recipe.short_description|truncatechars:120 }}</p>
+                            {% endif %}
+
+                            <ul class="recipe-meta">
+                                <li><strong>Categoria:</strong> {{ recipe.get_category_display }}</li>
+                                <li><strong>Difficoltà:</strong> {{ recipe.get_difficulty_display }}</li>
+                                <li><strong>Tempo totale:</strong> {{ recipe.total_time }} min</li>
+                            </ul>
+
+                            <a href="{% url 'recipe_detail' recipe.slug %}" class="btn-link">
+                                Apri ricetta
+                            </a>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+
+            {% if page_obj.paginator.num_pages > 1 %}
+                <nav class="pagination">
+                    {% if page_obj.has_previous %}
+                        <a href="?page=1&search={{ search }}&category={{ selected_category }}&difficulty={{ selected_difficulty }}&ordering={{ selected_ordering }}" class="pagination-link">
+                            Prima
+                        </a>
+                        <a href="?page={{ page_obj.previous_page_number }}&search={{ search }}&category={{ selected_category }}&difficulty={{ selected_difficulty }}&ordering={{ selected_ordering }}" class="pagination-link">
+                            Precedente
+                        </a>
+                    {% endif %}
+
+                    <span class="pagination-current">
+                        Pagina {{ page_obj.number }} di {{ page_obj.paginator.num_pages }}
+                    </span>
+
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}&search={{ search }}&category={{ selected_category }}&difficulty={{ selected_difficulty }}&ordering={{ selected_ordering }}" class="pagination-link">
+                            Successiva
+                        </a>
+                        <a href="?page={{ page_obj.paginator.num_pages }}&search={{ search }}&category={{ selected_category }}&difficulty={{ selected_difficulty }}&ordering={{ selected_ordering }}" class="pagination-link">
+                            Ultima
+                        </a>
+                    {% endif %}
+                </nav>
+            {% endif %}
+        {% else %}
+            <p>Nessuna ricetta trovata con i filtri selezionati.</p>
+        {% endif %}
+    </section>
+{% endblock %}

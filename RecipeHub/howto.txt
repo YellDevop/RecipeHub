@@ -1,0 +1,18 @@
+mkdir recipehub
+cd recipehub
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+pip install django
+pip freeze > requirements.txt
+django-admin startproject config .
+python manage.py startapp recipes
+python manage.py migrate
+python manage.py runserver
+
+pip install pillow
+pip freeze > requirements.txt
+python manage.py makemigrations
+python manage.py migrate
+python manage.py createsuperuser
+python manage.py runserver

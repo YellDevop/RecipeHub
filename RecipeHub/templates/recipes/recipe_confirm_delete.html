@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Elimina ricetta - RecipeHub{% endblock %}
+
+{% block content %}
+    <section class="delete-page">
+        <div class="delete-card">
+            <h2>Conferma eliminazione</h2>
+            <p>Stai per eliminare la ricetta <strong>{{ recipe.title }}</strong>.</p>
+            <p>Questa operazione non è reversibile.</p>
+
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-actions">
+                    <button type="submit" class="btn-danger">Elimina definitivamente</button>
+                    <a href="{% url 'dashboard_recipe_list' %}" class="btn-secondary">Annulla</a>
+                </div>
+            </form>
+        </div>
+    </section>
+{% endblock %}

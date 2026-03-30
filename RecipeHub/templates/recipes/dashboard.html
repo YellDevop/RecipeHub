@@ -1,0 +1,73 @@
+{% extends 'base.html' %} {% load recipe_extras %} {% block title %}Dashboard -
+RecipeHub{% endblock %} {% block content %}
+<section class="dashboard-header">
+  <h2>Dashboard</h2>
+  <p>Panoramica generale delle ricette presenti nel sistema.</p>
+</section>
+<section class="dashboard-toolbar">
+  <a href="{% url 'dashboard_recipe_list' %}" class="btn-primary"
+    >Gestisci ricette</a
+  >
+  <a href="{% url 'recipe_create' %}" class="btn-secondary">Nuova ricetta</a>
+</section>
+<section class="stats-grid">
+  <article class="stat-card">
+    <h3>Totale ricette</h3>
+    <p class="stat-number">{{ total_recipes }}</p>
+  </article>
+
+  <article class="stat-card">
+    <h3>Pubblicate</h3>
+    <p class="stat-number">{{ published_recipes }}</p>
+  </article>
+
+  <article class="stat-card">
+    <h3>Bozze</h3>
+    <p class="stat-number">{{ draft_recipes }}</p>
+  </article>
+
+  <article class="stat-card">
+    <h3>In evidenza</h3>
+    <p class="stat-number">{{ featured_recipes_count }}</p>
+  </article>
+</section>
+
+<section class="dashboard-section">
+  <div class="dashboard-panel">
+    <h3>Ultime ricette inserite</h3>
+
+    {% if latest_recipes %}
+    <ul class="dashboard-list">
+      {% for recipe in latest_recipes %}
+      <li>
+        <a href="{% url 'recipe_detail' recipe.slug %}"> {{ recipe.title }} </a>
+        <span>{{ recipe.created_at|date:"d/m/Y H:i" }}</span>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p>Nessuna ricetta disponibile.</p>
+    {% endif %}
+  </div>
+
+  <div class="dashboard-panel">
+    <h3>Ricette per categoria</h3>
+
+    {% if recipes_by_category %}
+    <ul class="dashboard-list">
+      {% for item in recipes_by_category %}
+      <li>
+        <span
+          >{{ category_labels|get_item:item.category|default:item.category
+          }}</span
+        >
+        <strong>{{ item.total }}</strong>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p>Nessun dato disponibile.</p>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
